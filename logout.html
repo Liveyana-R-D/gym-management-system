@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Logging out...</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { firebaseConfig } from './script/firebase.js'; // Adjust path if needed
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Sign out and redirect
+    signOut(auth)
+      .then(() => {
+        alert("You have been logged out.");
+        window.location.href = "index.html"; // Redirect to login page
+      })
+      .catch((error) => {
+        console.error("Logout error:", error);
+        alert("An error occurred while logging out.");
+      });
+  </script>
+</head>
+<body>
+  <p>Logging you out...</p>
+</body>
+</html>

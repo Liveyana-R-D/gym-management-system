@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Bills</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    h2 { text-align: center; }
+    .bill { background: #fff; border: 1px solid #ccc; padding: 15px; margin: 15px auto; max-width: 600px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .btn { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    .btn:hover { background-color: #0056b3; }
+  </style>
+</head>
+<body>
+  <h2>My Bills</h2>
+  <div id="billsContainer">Loading bills...</div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { firebaseConfig } from './script/firebase.js';
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    const billsContainer = document.getElementById("billsContainer");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userEmail = user.email;
+
+          // Step 1: Check if this email exists in the 'users' collection
+          const userQuery = query(collection(db, "users"), where("email", "==", userEmail));
+          const userSnapshot = await getDocs(userQuery);
+
+          if (userSnapshot.empty) {
+            billsContainer.innerHTML = "<p>Your user record was not found.</p>";
+            return;
+          }
+
+          // Step 2: Get bills that match this email
+          const billQuery = query(collection(db, "bills"), where("email", "==", userEmail));
+          const billSnapshot = await getDocs(billQuery);
+
+          if (billSnapshot.empty) {
+            billsContainer.innerHTML = "<p>No bills found for your account.</p>";
+            return;
+          }
+
+          billsContainer.innerHTML = ""; // Clear loading
+
+          billSnapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            const div = document.createElement("div");
+            div.className = "bill";
+            div.innerHTML = `
+              <h3>Velvet Pulse Fitness - Payment Receipt</h3>
+              <p><strong>Name:</strong> ${data.name}</p>
+              <p><strong>Email:</strong> ${data.email}</p>
+              <p><strong>Phone:</strong> ${data.phone}</p>
+              <p><strong>Package:</strong> ${data.package}</p>
+              <p><strong>Amount Paid:</strong> ₹${data.amount}</p>
+              <p><strong>Date:</strong> ${data.paymentDate}</p>
+              <p><strong>Method:</strong> ${data.method}</p>
+              <button class="btn" onclick="downloadBill(this)">Download PDF</button>
+            `;
+            billsContainer.appendChild(div);
+          });
+
+        } catch (err) {
+          console.error("Error fetching bills:", err);
+          billsContainer.innerHTML = "<p>Error loading bills. Please try again later.</p>";
+        }
+      } else {
+        billsContainer.innerHTML = "<p>Please log in to view your bills.</p>";
+      }
+    });
+
+    // PDF Download Function
+    window.downloadBill = async function(button) {
+      const billDiv = button.parentElement;
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+
+      await pdf.html(billDiv, {
+        callback: function (doc) {
+          doc.save("My_Bill.pdf");
+        },
+        x: 10,
+        y: 10
+      });
+    };
+  </script>
+</body>
+</html>

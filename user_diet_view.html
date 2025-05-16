@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User - View Diet Plans</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    h1 { text-align: center; }
+  </style>
+</head>
+<body>
+
+<h1>Available Diet Plans</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Diet Name</th>
+      <th>Description</th>
+      <th>Calories/day</th>
+      <th>Meal Frequency</th>
+      <th>Suitable For</th>
+      <th>Duration (weeks)</th>
+    </tr>
+  </thead>
+  <tbody id="diet-table-body">
+    <tr><td colspan="6">Loading diet plans...</td></tr>
+  </tbody>
+</table>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+  import { firebaseConfig } from './script/firebase.js';  // Make sure the path is correct
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const tableBody = document.getElementById('diet-table-body');
+
+  async function loadDiets() {
+    const querySnapshot = await getDocs(collection(db, 'diets'));
+    const diets = [];
+    querySnapshot.forEach(docSnap => {
+      diets.push(docSnap.data());
+    });
+
+    if (diets.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="6">No diet plans available.</td></tr>';
+      return;
+    }
+
+    tableBody.innerHTML = '';
+    diets.forEach(diet => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${diet.name}</td>
+        <td>${diet.description}</td>
+        <td>${diet.calories}</td>
+        <td>${diet.mealFrequency}</td>
+        <td>${diet.suitableFor}</td>
+        <td>${diet.duration}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  loadDiets();
+</script>
+
+</body>
+</html>

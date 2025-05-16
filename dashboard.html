@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard - Gym Management</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #343a40;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .logout-btn {
+      padding: 8px 15px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .container {
+      padding: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      background: #f1f1f1;
+    }
+
+    .card h3 {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Admin Dashboard</h1>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="container">
+    <div class="card" onclick="location.href='add_member.html'">
+      <h3>Add Member</h3>
+    </div>
+    <div class="card" onclick="location.href='manage_members.html'">
+      <h3>Update/Delete Members</h3>
+    </div>
+    <div class="card" onclick="location.href='create_bill.html'">
+      <h3>Create Bills</h3>
+    </div>
+    <div class="card" onclick="location.href='view_bills.html'">
+      <h3>View Bills</h3>
+    </div>
+    <div class="card" onclick="location.href='assign_package.html'">
+      <h3>Assign Fee Package</h3>
+    </div>
+    <div class="card" onclick="location.href='notifications.html'">
+      <h3>Send Notifications</h3>
+    </div>
+    <div class="card" onclick="location.href='monthly-report.html'">
+      <h3>Monthly Report</h3>
+    </div>
+    <div class="card" onclick="location.href='supplement_store.html'">
+      <h3>Supplement Store</h3>
+    </div>
+    <div class="card" onclick="location.href='diet.html'">
+      <h3>Diet Details</h3>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyB4o1DvyUt2I0T0kM7YIL3WVeKUdg8fwq4",
+  authDomain: "gym-management-48806.firebaseapp.com",
+  projectId: "gym-management-48806",
+  storageBucket: "gym-management-48806.appspot.com",
+  messagingSenderId: "465102465377",
+  appId: "1:465102465377:web:73b37169334a682574bd20"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore();
+
+    // Check if admin
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const uid = user.uid;
+        const docRef = doc(db, "users", uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const role = docSnap.data().role;
+          if (role !== "admin") {
+            alert("Access Denied! Redirecting to home.");
+            window.location.href = "index.html";
+          }
+        } else {
+          alert("User data not found.");
+          window.location.href = "index.html";
+        }
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    window.logout = function () {
+      signOut(auth).then(() => {
+        window.location.href = "index.html";
+      });
+    }
+  </script>
+</body>
+</html>

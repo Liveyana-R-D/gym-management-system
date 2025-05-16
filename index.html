@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gym Management System - Login/Register</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      box-shadow: 0 0 10px #ccc;
+      border-radius: 8px;
+      width: 300px;
+    }
+    h2 {
+      text-align: center;
+    }
+    input, select, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .switch {
+      text-align: center;
+      cursor: pointer;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="formTitle">Register</h2>
+
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <select id="role">
+      <option value="user">User</option> <!-- Default role changed to user -->
+      <option value="member">Member</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button onclick="submitForm()">Register</button>
+    
+    <p class="switch" onclick="toggleForm()">Already have an account? Login</p>
+  </div>
+
+  <script type="module">
+    // Firebase Config (Replace with your config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyB4o1DvyUt2I0T0kM7YIL3WVeKUdg8fwq4",
+      authDomain: "gym-management-48806.firebaseapp.com",
+      projectId: "gym-management-48806",
+      storageBucket: "gym-management-48806.firebasestorage.app",
+      messagingSenderId: "465102465377",
+      appId: "1:465102465377:web:73b37169334a682574bd20"
+    };
+
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getFirestore, setDoc, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore();
+
+    let isLogin = false;
+
+    window.toggleForm = function() {
+      isLogin = !isLogin;
+      document.getElementById("formTitle").innerText = isLogin ? "Login" : "Register";
+      document.querySelector("button").innerText = isLogin ? "Login" : "Register";
+      document.getElementById("role").style.display = isLogin ? "none" : "block";
+      document.querySelector(".switch").innerText = isLogin
+        ? "Don't have an account? Register"
+        : "Already have an account? Login";
+    }
+
+    window.submitForm = async function() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const role = document.getElementById("role").value;
+
+      if (isLogin) {
+        // Login Logic
+        try {
+          const userCred = await signInWithEmailAndPassword(auth, email, password);
+          const uid = userCred.user.uid;
+          const userDoc = await getDoc(doc(db, "users", uid));
+
+          if (userDoc.exists()) {
+            const role = userDoc.data().role;
+            if (role === "admin") {
+              alert("Logged in as Admin");
+              window.location.href = "dashboard.html";
+            } else if (role === "member") {
+              alert("Logged in as Member");
+              window.location.href = "member.html";
+            } else if (role === "user") {
+              alert("Logged in as User (limited features)");
+              window.location.href = "user.html";
+            } else {
+              alert("Invalid role!");
+            }
+          } else {
+            alert("User data not found!");
+          }
+        } catch (error) {
+          alert("Login Error: " + error.message);
+        }
+      } else {
+        // Register Logic
+        if (role === "member") {
+          // Only allow registration if email is in 'members' collection
+          const membersRef = collection(db, "members");
+          const q = query(membersRef, where("email", "==", email));
+          const querySnapshot = await getDocs(q);
+
+          if (querySnapshot.empty) {
+            alert("This email is not authorized for member registration. Please contact the admin.");
+            return;
+          }
+        }
+
+        // For user and admin, no email authorization check (if you want, you can add admin email validation too)
+
+        try {
+          const userCred = await createUserWithEmailAndPassword(auth, email, password);
+          const uid = userCred.user.uid;
+
+          // Save user info with role
+          await setDoc(doc(db, "users", uid), {
+            email: email,
+            role: role,
+            createdAt: new Date()
+          });
+
+          alert("Registered Successfully! Now login.");
+          toggleForm();
+        } catch (error) {
+          alert("Registration Error: " + error.message);
+        }
+      }
+    }
+  </script>
+</body>
+</html>

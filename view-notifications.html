@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>View Notifications</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    h2 { text-align: center; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .notification { padding: 10px; border-bottom: 1px solid #ddd; }
+    .notification:last-child { border-bottom: none; }
+    label, input, button { width: 100%; margin-top: 10px; padding: 8px; }
+    button { background-color: #007bff; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>View Notifications</h2>
+
+    <label for="email">Enter Member Email</label>
+    <input type="email" id="email" placeholder="member@example.com" />
+    <button onclick="fetchNotifications()">Fetch Notifications</button>
+
+    <div id="notifications" style="margin-top: 20px;"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // Use the same Firebase config as your admin side
+    const firebaseConfig = {
+      apiKey: "AIzaSyB4o1DvyUt2I0T0kM7YIL3WVeKUdg8fwq4",
+      authDomain: "gym-management-48806.firebaseapp.com",
+      projectId: "gym-management-48806",
+      storageBucket: "gym-management-48806.appspot.com",
+      messagingSenderId: "465102465377",
+      appId: "1:465102465377:web:73b37169334a682574bd20"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.fetchNotifications = async () => {
+      const email = document.getElementById("email").value.trim();
+      const output = document.getElementById("notifications");
+      output.innerHTML = "";
+
+      if (!email) {
+        alert("Please enter a member email.");
+        return;
+      }
+
+      try {
+        const q = query(collection(db, "notifications"), where("memberEmail", "==", email));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          output.innerHTML = "<p>No notifications found for this member.</p>";
+          return;
+        }
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const div = document.createElement("div");
+          div.className = "notification";
+          div.innerHTML = `
+            <p><strong>Message:</strong> ${data.message}</p>
+            <p><small><strong>Date:</strong> ${new Date(data.sentAt).toLocaleString()}</small></p>
+          `;
+          output.appendChild(div);
+        });
+      } catch (error) {
+        alert("Error fetching notifications: " + error.message);
+      }
+    };
+  </script>
+</body>
+</html>

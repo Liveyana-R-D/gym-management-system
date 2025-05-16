@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Supplement Store</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  </style>
+</head>
+<body>
+
+  <h1>Available Supplements</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Price (₹)</th>
+        <th>Stock</th>
+      </tr>
+    </thead>
+    <tbody id="supplement-table-body">
+      <tr><td colspan="4">Loading supplements...</td></tr>
+    </tbody>
+  </table>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { firebaseConfig } from './script/firebase.js'; // your Firebase config
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const tableBody = document.getElementById('supplement-table-body');
+
+    async function loadSupplements() {
+      const querySnapshot = await getDocs(collection(db, 'supplements'));
+      const supplements = [];
+      querySnapshot.forEach(docSnap => {
+        supplements.push(docSnap.data());
+      });
+      renderTable(supplements);
+    }
+
+    function renderTable(supplements) {
+      if (supplements.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4">No supplements found.</td></tr>';
+        return;
+      }
+      tableBody.innerHTML = '';
+      supplements.forEach((supp) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${supp.name}</td>
+          <td>${supp.description}</td>
+          <td>₹${parseFloat(supp.price).toFixed(2)}</td>
+          <td>${supp.stock}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    loadSupplements();
+  </script>
+
+</body>
+</html>

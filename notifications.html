@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Send Notifications - Admin</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; background: #f9f9f9; }
+    h2 { text-align: center; }
+    label { display: block; margin-top: 15px; }
+    select, textarea, button {
+      width: 100%; padding: 10px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #007bff; color: white; border: none; cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Send Notification</h2>
+
+  <label for="memberSelect">Select Member</label>
+  <select id="memberSelect">
+    <option value="">-- Select Member --</option>
+  </select>
+
+  <label for="message">Notification Message</label>
+  <textarea id="message" rows="5" placeholder="Enter your notification message here"></textarea>
+
+  <button id="sendBtn">Send Notification</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // TODO: Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyB4o1DvyUt2I0T0kM7YIL3WVeKUdg8fwq4",
+  authDomain: "gym-management-48806.firebaseapp.com",
+  projectId: "gym-management-48806",
+  storageBucket: "gym-management-48806.appspot.com",  // corrected domain!
+  messagingSenderId: "465102465377",
+  appId: "1:465102465377:web:73b37169334a682574bd20"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const memberSelect = document.getElementById("memberSelect");
+    const messageInput = document.getElementById("message");
+    const sendBtn = document.getElementById("sendBtn");
+
+    // Load members from Firestore into dropdown
+    async function loadMembers() {
+      try {
+        const membersSnapshot = await getDocs(collection(db, "members"));
+        membersSnapshot.forEach(docSnap => {
+          const member = docSnap.data();
+          const option = document.createElement("option");
+          option.value = docSnap.id;
+          option.textContent = `${member.name} (${member.email || "no email"})`;
+          memberSelect.appendChild(option);
+        });
+      } catch (error) {
+        alert("Error loading members: " + error.message);
+      }
+    }
+
+    // Send notification to selected member
+    // Inside your sendNotification() function – REPLACE the current version
+async function sendNotification() {
+  const selectedOption = memberSelect.options[memberSelect.selectedIndex];
+  const memberId = memberSelect.value;
+  const message = messageInput.value.trim();
+
+  if (!memberId) {
+    alert("Please select a member.");
+    return;
+  }
+  if (!message) {
+    alert("Please enter a notification message.");
+    return;
+  }
+
+  // Extract email from the option text (e.g., "John (john@example.com)")
+  const emailMatch = selectedOption.textContent.match(/\(([^)]+)\)/);
+  const memberEmail = emailMatch ? emailMatch[1] : null;
+
+  if (!memberEmail) {
+    alert("Member email not found.");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "notifications"), {
+      memberEmail: memberEmail,
+      message: message,
+      sentAt: new Date().toISOString(),
+      read: false
+    });
+
+    alert("Notification sent successfully!");
+    messageInput.value = "";
+    memberSelect.value = "";
+  } catch (error) {
+    alert("Failed to send notification: " + error.message);
+  }
+}
+
+    sendBtn.addEventListener("click", sendNotification);
+
+    // Load members when page loads
+    loadMembers();
+
+  </script>
+
+</body>
+</html>

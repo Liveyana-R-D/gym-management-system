@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Admin - Supplement Store</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  input, button { padding: 6px; margin: 4px 0; }
+  button { cursor: pointer; }
+  .form-group { margin-bottom: 10px; }
+  .actions button { margin-right: 5px; }
+</style>
+</head>
+<body>
+
+<h1>Supplement Store Management</h1>
+
+<h2>Add / Update Supplement</h2>
+<form id="supplement-form">
+  <input type="hidden" id="supplement-id" />
+  <div class="form-group">
+    <label for="name">Name:</label><br />
+    <input type="text" id="name" required />
+  </div>
+  <div class="form-group">
+    <label for="description">Description:</label><br />
+    <textarea id="description" rows="3" required></textarea>
+  </div>
+  <div class="form-group">
+    <label for="price">Price (₹):</label><br />
+    <input type="number" id="price" min="0" step="0.01" required />
+  </div>
+  <div class="form-group">
+    <label for="stock">Stock Quantity:</label><br />
+    <input type="number" id="stock" min="0" required />
+  </div>
+  <button type="submit">Save Supplement</button>
+  <button type="button" id="reset-btn">Reset</button>
+</form>
+
+<h2>Current Supplements</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th><th>Description</th><th>Price (₹)</th><th>Stock</th><th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="supplement-table-body">
+    <tr><td colspan="5">Loading supplements...</td></tr>
+  </tbody>
+</table>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+  import { firebaseConfig } from './script/firebase.js';  // your config file
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const form = document.getElementById('supplement-form');
+  const supplementIdInput = document.getElementById('supplement-id');
+  const nameInput = document.getElementById('name');
+  const descriptionInput = document.getElementById('description');
+  const priceInput = document.getElementById('price');
+  const stockInput = document.getElementById('stock');
+  const tableBody = document.getElementById('supplement-table-body');
+  const resetBtn = document.getElementById('reset-btn');
+
+  let supplements = [];
+
+  async function loadSupplements() {
+    const querySnapshot = await getDocs(collection(db, 'supplements'));
+    supplements = [];
+    querySnapshot.forEach(docSnap => {
+      supplements.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    renderTable();
+  }
+
+  function renderTable() {
+    if(supplements.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="5">No supplements found.</td></tr>';
+      return;
+    }
+    tableBody.innerHTML = '';
+    supplements.forEach((supp) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${supp.name}</td>
+        <td>${supp.description}</td>
+        <td>₹${supp.price.toFixed(2)}</td>
+        <td>${supp.stock}</td>
+        <td class="actions">
+          <button onclick="editSupplement('${supp.id}')">Edit</button>
+          <button onclick="deleteSupplement('${supp.id}')">Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  async function deleteSupplement(id) {
+    if(!confirm('Are you sure you want to delete this supplement?')) return;
+    await deleteDoc(doc(db, 'supplements', id));
+    alert('Supplement deleted');
+    await loadSupplements();
+  }
+
+  window.editSupplement = (id) => {
+    const supp = supplements.find(s => s.id === id);
+    if (!supp) return alert('Supplement not found');
+    supplementIdInput.value = supp.id;
+    nameInput.value = supp.name;
+    descriptionInput.value = supp.description;
+    priceInput.value = supp.price;
+    stockInput.value = supp.stock;
+  };
+
+    // **Add this line to expose deleteSupplement globally**
+window.deleteSupplement = deleteSupplement;  
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = supplementIdInput.value.trim();
+    const name = nameInput.value.trim();
+    const description = descriptionInput.value.trim();
+    const price = parseFloat(priceInput.value);
+    const stock = parseInt(stockInput.value);
+
+    if(!name || !description || isNaN(price) || isNaN(stock)) {
+      alert('Please fill all fields correctly');
+      return;
+    }
+
+    if(id) {
+      // Update existing
+      const docRef = doc(db, 'supplements', id);
+      await updateDoc(docRef, { name, description, price, stock });
+      alert('Supplement updated');
+    } else {
+      // Add new
+      await addDoc(collection(db, 'supplements'), { name, description, price, stock });
+      alert('Supplement added');
+    }
+    resetForm();
+    await loadSupplements();
+  });
+
+  resetBtn.addEventListener('click', resetForm);
+
+  function resetForm() {
+    supplementIdInput.value = '';
+    nameInput.value = '';
+    descriptionInput.value = '';
+    priceInput.value = '';
+    stockInput.value = '';
+  }
+
+  // Load supplements on page load
+  loadSupplements();
+
+</script>
+
+</body>
+</html>

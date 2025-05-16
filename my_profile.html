@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Profile - Member</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    h1 { text-align: center; }
+    .profile-box { border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+    .field { margin-bottom: 10px; }
+    .label { font-weight: bold; }
+    #logout-btn { margin-top: 20px; padding: 8px 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<h1>My Profile</h1>
+
+<div class="profile-box">
+  <div class="field"><span class="label">Name:</span> <span id="name"></span></div>
+  <div class="field"><span class="label">Email:</span> <span id="email"></span></div>
+  <div class="field"><span class="label">Phone:</span> <span id="phone"></span></div>
+  <div class="field"><span class="label">Package:</span> <span id="package"></span></div>
+  <div class="field"><span class="label">Join Date:</span> <span id="createdAt"></span></div>
+</div>
+
+<button id="logout-btn">Logout</button>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+  import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+  import { firebaseConfig } from './script/firebase.js';
+
+  
+
+  // Init
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const nameEl = document.getElementById("name");
+  const emailEl = document.getElementById("email");
+  const phoneEl = document.getElementById("phone");
+  const packageEl = document.getElementById("package");
+  const joinDateEl = document.getElementById("createdAt");
+  const logoutBtn = document.getElementById("logout-btn");
+
+  onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    alert("You are logged out!");
+    window.location.href = "index.html";
+    return;
+  }
+
+  try {
+    const membersRef = collection(db, "members");
+    const q = query(membersRef, where("email", "==", user.email));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const docSnap = querySnapshot.docs[0];
+      const data = docSnap.data();
+
+      nameEl.textContent = data.name || "N/A";
+      emailEl.textContent = user.email || "N/A";
+      phoneEl.textContent = data.phone || "N/A";
+      packageEl.textContent = data.package || "N/A";
+      joinDateEl.textContent = data.createdAt || "N/A";
+    } else {
+      alert("Member profile not found!");
+    }
+  } catch (err) {
+    console.error("Error loading profile:", err);
+    alert("Failed to load profile data.");
+  }
+});
+
+  logoutBtn.addEventListener("click", () => {
+    signOut(auth).then(() => {
+      window.location.href = "index.html";
+    });
+  });
+</script>
+
+</body>
+</html>

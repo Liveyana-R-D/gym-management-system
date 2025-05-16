@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>View Bills - Admin</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #28a745;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f4f4f4;
+    }
+    button.download-btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button.download-btn:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Saved Bills</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Package</th>
+        <th>Amount (₹)</th>
+        <th>Payment Date</th>
+        <th>Method</th>
+        <th>Download</th>
+      </tr>
+    </thead>
+    <tbody id="billsTableBody">
+      <!-- Bills will be loaded here -->
+    </tbody>
+  </table>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { firebaseConfig } from './script/firebase.js';
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const billsTableBody = document.getElementById("billsTableBody");
+
+    async function loadBills() {
+  const snapshot = await getDocs(collection(db, "bills"));
+  billsTableBody.innerHTML = ""; // Clear previous
+
+  if (snapshot.empty) {
+    billsTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No bills found</td></tr>`;
+    return;
+  }
+
+  snapshot.forEach(docSnap => {
+    const bill = docSnap.data();
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${bill.name}</td>
+      <td>${bill.package}</td>
+      <td>₹${bill.amount}</td>
+      <td>${bill.paymentDate}</td>
+      <td>${bill.method}</td>
+      <td><button class="download-btn">Download PDF</button></td>
+    `;
+
+    // Attach click listener here instead of inline onclick attribute
+    tr.querySelector("button.download-btn").addEventListener("click", () => {
+      downloadBillPDF(bill);
+    });
+
+    billsTableBody.appendChild(tr);
+  });
+}
+
+
+    window.downloadBillPDF = (bill) => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Create a hidden container for the bill HTML
+      const container = document.createElement("div");
+      container.style.padding = "10px";
+      container.innerHTML = `
+        <h3>Velvet Pulse Fitness - Payment Receipt</h3>
+        <p><strong>Name:</strong> ${bill.name}</p>
+        <p><strong>Email:</strong> ${bill.email}</p>
+        <p><strong>Phone:</strong> ${bill.phone}</p>
+        <p><strong>Package:</strong> ${bill.package}</p>
+        <p><strong>Amount Paid:</strong> ₹${bill.amount}</p>
+        <p><strong>Date:</strong> ${bill.paymentDate}</p>
+        <p><strong>Method:</strong> ${bill.method}</p>
+      `;
+
+      doc.html(container, {
+        callback: function (pdf) {
+          pdf.save(`Gym_Bill_${bill.name.replace(/\s+/g, '_')}.pdf`);
+        },
+        x: 10,
+        y: 10,
+        width: 180
+      });
+    };
+
+    loadBills();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Assign Fee Package - Admin</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 450px; margin: auto; background: #f9f9f9; }
+    h2 { text-align: center; margin-bottom: 25px; }
+    label { margin-top: 15px; display: block; }
+    select, input, button {
+      width: 100%; padding: 10px; margin-top: 5px;
+      border: 1px solid #ccc; border-radius: 5px;
+      box-sizing: border-box;
+    }
+    input[readonly] {
+      background-color: #eee;
+    }
+    button {
+      background-color: #007bff; color: white; border: none;
+      cursor: pointer; font-size: 16px; margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Assign Fee Package</h2>
+
+  <label for="memberSelect">Select Member:</label>
+  <select id="memberSelect">
+    <option value="">-- Select Member --</option>
+  </select>
+
+  <label for="packageSelect">Select Package:</label>
+  <select id="packageSelect">
+    <option value="Monthly">Monthly</option>
+    <option value="Quarterly">Quarterly</option>
+    <option value="Yearly">Yearly</option>
+  </select>
+
+  <label for="amount">Amount (₹):</label>
+  <input type="number" id="amount" readonly />
+
+  <button id="assignBtn">Assign Package</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { firebaseConfig } from './script/firebase.js'; // Your firebase config file
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const memberSelect = document.getElementById('memberSelect');
+    const packageSelect = document.getElementById('packageSelect');
+    const amountInput = document.getElementById('amount');
+    const assignBtn = document.getElementById('assignBtn');
+
+    const packagePrices = {
+      "Monthly": 1000,
+      "Quarterly": 2500,
+      "Yearly": 9000
+    };
+
+    // Load members into dropdown and set default selected package + amount
+    async function loadMembers() {
+      const snapshot = await getDocs(collection(db, "members"));
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const option = document.createElement('option');
+        option.value = docSnap.id;
+        option.textContent = `${data.name} (${data.email})`;
+        option.dataset.package = data.package || "";
+        memberSelect.appendChild(option);
+      });
+    }
+
+    // When member is selected, update package dropdown and amount
+    memberSelect.addEventListener('change', () => {
+      const selectedOption = memberSelect.options[memberSelect.selectedIndex];
+      const currentPackage = selectedOption.dataset.package || "";
+      if (currentPackage && packagePrices[currentPackage] !== undefined) {
+        packageSelect.value = currentPackage;
+        amountInput.value = packagePrices[currentPackage];
+      } else {
+        packageSelect.value = "Monthly"; // default
+        amountInput.value = packagePrices["Monthly"];
+      }
+    });
+
+    // When package is changed, update amount automatically
+    packageSelect.addEventListener('change', () => {
+      const pkg = packageSelect.value;
+      amountInput.value = packagePrices[pkg] || 0;
+    });
+
+    assignBtn.addEventListener('click', async () => {
+      const memberId = memberSelect.value;
+      const selectedPackage = packageSelect.value;
+
+      if (!memberId) {
+        alert("Please select a member.");
+        return;
+      }
+
+      try {
+        const memberRef = doc(db, "members", memberId);
+        await updateDoc(memberRef, { package: selectedPackage });
+        
+        // Update the dataset.package so it reflects immediately without reload
+        memberSelect.options[memberSelect.selectedIndex].dataset.package = selectedPackage;
+
+        alert(`Package updated to "${selectedPackage}" successfully!`);
+      } catch (error) {
+        alert("Error updating package: " + error.message);
+      }
+    });
+
+    loadMembers();
+  </script>
+
+</body>
+</html>
