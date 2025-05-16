@@ -6,6 +6,14 @@ The **GYM Management System** is a web-based application designed to digitize an
 
 ---
 
+## Live Demo
+
+You can check out the live page for this project at the following URL:
+
+[Live Demo](https://Liveyana-R-D.github.io/gym-management-system/)
+
+---
+
 ## Technologies Used
 
 - **Frontend**: HTML, CSS, JavaScript  
