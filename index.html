@@ -4,40 +4,97 @@
   <title>Gym Management System - Login/Register</title>
   <link rel="icon" type="image/x-icon" href="gym.avif">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .container {
-      background: white;
-      padding: 30px;
-      box-shadow: 0 0 10px #ccc;
-      border-radius: 8px;
-      width: 300px;
-    }
-    h2 {
-      text-align: center;
-    }
-    input, select, button {
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-    }
-    button {
-      background: #28a745;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .switch {
-      text-align: center;
-      cursor: pointer;
-      color: #007bff;
-    }
+    * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: url('images/login.jpg') no-repeat center center fixed;
+  background-size: cover;
+  backdrop-filter: brightness(0.6); /* Slight dark overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: white;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.6); /* darker layer */
+  z-index: -1;
+}
+
+.container {
+  background: #202020;
+  padding: 40px 30px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  width: 340px;
+  transition: 0.3s ease-in-out;
+}
+
+.container:hover {
+  transform: scale(1.02);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #3fd17f;
+}
+
+input,
+select,
+button {
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  border: none;
+  outline: none;
+  background: #2e2e2e;
+  color: white;
+}
+
+input::placeholder,
+select {
+  color: #ccc;
+}
+
+button {
+  background: #3fd17f;
+  color: #000;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #2ebd6d;
+}
+
+.switch {
+  text-align: center;
+  margin-top: 10px;
+  color: #3fd17f;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.switch:hover {
+  text-decoration: underline;
+  color: #4efb9b;
+}
+
   </style>
 </head>
 <body>

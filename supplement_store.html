@@ -5,13 +5,100 @@
 <title>Admin - Supplement Store</title>
 <link rel="icon" type="image/x-icon" href="gym.avif">
 <style>
-  body { font-family: Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-  input, button { padding: 6px; margin: 4px 0; }
-  button { cursor: pointer; }
-  .form-group { margin-bottom: 10px; }
-  .actions button { margin-right: 5px; }
+  body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+  background: url('images/supplement.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #e0e0e0;
+}
+
+h1, h2 {
+  text-align: center;
+  color: #7CFC00; /* LawnGreen for gym energy */
+  text-shadow: 0 0 5px #32CD32; /* limegreen glow */
+}
+
+.form-group label {
+  color: #a0ffa0;
+  font-weight: 600;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #32CD32;
+  border-radius: 5px;
+  background-color: #222;
+  color: #d0f0d0;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #7CFC00;
+  box-shadow: 0 0 8px #7CFC00;
+  background-color: #1a1a1a;
+}
+
+button {
+  background-color: #32CD32;
+  color: #111;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #7CFC00;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 25px;
+  background-color: rgba(0,0,0,0.75);
+  color: #d0f0d0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px #32CD32;
+}
+
+th, td {
+  border: 1px solid #32CD32;
+  padding: 12px 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #1a1a1a;
+  color: #7CFC00;
+  font-weight: 700;
+}
+
+.actions button {
+  background-color: #228B22; /* ForestGreen */
+  padding: 6px 12px;
+  font-size: 13px;
+  margin-right: 5px;
+}
+
+.actions button:hover {
+  background-color: #32CD32;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
 </style>
 </head>
 <body>

@@ -4,27 +4,79 @@
   <meta charset="UTF-8" />
   <title>Assign Fee Package - Admin</title>
   <link rel="icon" type="image/x-icon" href="gym.avif">
+  
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 450px; margin: auto; background: #f9f9f9; }
-    h2 { text-align: center; margin-bottom: 25px; }
-    label { margin-top: 15px; display: block; }
-    select, input, button {
-      width: 100%; padding: 10px; margin-top: 5px;
-      border: 1px solid #ccc; border-radius: 5px;
-      box-sizing: border-box;
-    }
-    input[readonly] {
-      background-color: #eee;
-    }
-    button {
-      background-color: #007bff; color: white; border: none;
-      cursor: pointer; font-size: 16px; margin-top: 20px;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-  </style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 30px;
+    max-width: 480px;
+    margin: 40px auto;
+    background: 
+      linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+      url('images/bill.avif') no-repeat center center fixed;
+    background-size: cover;
+    color: #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #00ff99;
+    text-shadow: 1px 1px 6px #000;
+  }
+
+  label {
+    margin-top: 20px;
+    display: block;
+    font-weight: 600;
+    text-shadow: 0 0 3px #000;
+  }
+
+  select, input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    border: 1.5px solid #333;
+    background-color: rgba(34, 34, 34, 0.85);
+    color: #eee;
+    backdrop-filter: blur(4px);
+  }
+
+  select:hover, input:hover {
+    border-color: #00ff99;
+    background-color: rgba(34, 34, 34, 0.95);
+  }
+
+  input[readonly] {
+    background-color: rgba(51, 51, 51, 0.7);
+    color: #bbb;
+    cursor: not-allowed;
+  }
+
+  button {
+    background-color: #00ff99;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    margin-top: 28px;
+    box-shadow: 0 0 12px #00ff99aa;
+    backdrop-filter: blur(6px);
+  }
+
+  button:hover {
+    background-color: #00cc77;
+    box-shadow: 0 0 18px #00cc77cc;
+  }
+</style>
+
+
 </head>
 <body>
 

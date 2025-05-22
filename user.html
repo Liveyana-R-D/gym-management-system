@@ -6,35 +6,65 @@
   <link rel="icon" type="image/x-icon" href="gym.avif">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 800px;
-      margin: auto;
-    }
-    h1 { color: #2c3e50; }
-    .nav {
-      margin-top: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    .nav a {
-      display: block;
-      background-color: #3498db;
-      color: white;
-      padding: 12px;
-      text-align: center;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-    }
-    .nav a:hover {
-      background-color: #2980b9;
-    }
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: url('images/bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+}
+
+.container {
+  max-width: 800px;
+  margin: 80px auto;
+  padding: 30px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+}
+
+h1 {
+  text-align: center;
+  font-size: 32px;
+  color: #ff2e63;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+p {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #ccc;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.nav a {
+  background-color: #ff2e63;
+  color: #fff;
+  padding: 15px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.nav a:hover {
+  background-color: #e6003c;
+  transform: scale(1.05);
+}
+
   </style>
 </head>
 <body>
-
+ <div class="container">
   <h1>Welcome, User!</h1>
   <p>This is your USER dashboard.</p>
 
@@ -46,6 +76,6 @@
     
     <a href="logout.html">🚪 Logout</a>
   </div>
-
+</div>
 </body>
 </html>

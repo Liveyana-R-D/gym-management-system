@@ -7,61 +7,79 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8f9fa;
-      margin: 0;
-      padding: 0;
-    }
+    
+  body {
+    font-family: Arial, sans-serif;
+    background: url('images/bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    color: white;
+    position: relative;
+  }
 
-    .header {
-      background-color: #343a40;
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+  /* Overlay to darken the background */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background: rgba(0, 0, 0, 0.6); /* dark overlay */
+    z-index: -1;
+  }
 
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+  .header {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-    .logout-btn {
-      padding: 8px 15px;
-      background: #dc3545;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 4px;
-    }
+  .header h1 {
+    margin: 0;
+    font-size: 24px;
+  }
 
-    .container {
-      padding: 30px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-    }
+  .logout-btn {
+    padding: 8px 15px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+  }
 
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+  .container {
+    padding: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
 
-    .card:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      background: #f1f1f1;
-    }
+  .card {
+    background: rgba(255, 255, 255, 0.1); /* slight transparency */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+    color: white;
+    backdrop-filter: blur(5px);
+  }
 
-    .card h3 {
-      margin: 10px 0;
-    }
+  .card:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.02);
+  }
+
+  .card h3 {
+    margin: 10px 0;
+  } 
   </style>
 </head>
 <body>
